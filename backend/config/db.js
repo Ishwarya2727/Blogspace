@@ -4,11 +4,12 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 let mongoMemoryServer = null;
 
 export const connectDB = async () => {
+  const isCustomUri = Boolean(process.env.MONGO_URI);
   const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/blogspace';
   
   try {
-    // Set low timeout for initial connection attempt so we quickly fall back if local daemon isn't running
-    await mongoose.connect(uri, { serverSelectionTimeoutMS: 2500 });
+    // Set 10s timeout for Atlas/Custom URI, 2.5s for local default uri to quickly trigger in-memory fallback
+    await mongoose.connect(uri, { serverSelectionTimeoutMS: isCustomUri ? 10000 : 2500 });
     console.log(`[MongoDB] Connected successfully to target database: ${mongoose.connection.host}`);
   } catch (err) {
     console.warn(`[MongoDB] Could not connect to primary MongoDB at ${uri}: ${err.message}`);

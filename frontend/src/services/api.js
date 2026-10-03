@@ -1,4 +1,12 @@
-const API_BASE = '/api';
+const getApiBase = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) return '/api';
+  const cleaned = envUrl.replace(/\/$/, '');
+  return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
+};
+
+const API_BASE = getApiBase();
+
 
 // Helper for making HTTP requests with optional JWT token
 const request = async (endpoint, options = {}) => {
